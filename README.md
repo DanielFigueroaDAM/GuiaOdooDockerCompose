@@ -7,8 +7,10 @@ Esta guía completa te llevará paso a paso por el proceso de instalación y con
 1. [Requisitos Previos](#requisitos-previos)
 2. [Paso 1: Preparar el IDE (VS Code)](#paso-1-preparar-el-ide-vs-code)
 3. [Paso 2: Instalar Odoo 18 y PgAdmin con Docker Compose](#paso-2-instalar-odoo-18-y-pgadmin-con-docker-compose)
-4. [Paso 3: Configurar Odoo con Datos de Demostración](#paso-3-configurar-odoo-con-datos-de-demostración)
-5. [Paso 4: Explorar la Base de Datos con PgAdmin](#paso-4-explorar-la-base-de-datos-con-pgadmin)
+4. [Paso 3: Configurar PgAdmin](#paso-3-configurar-pgadmin)
+5. [Paso 4: Crear Base de Datos en Odoo](#paso-4-crear-base-de-datos-en-odoo)
+6. [Paso 5: Instalar Módulos en Odoo](#paso-5-instalar-módulos-en-odoo)
+7. [Paso 6: Inspeccionar Base de Datos con PgAdmin](#paso-6-inspeccionar-base-de-datos-con-pgadmin)
 
 ---
 
@@ -43,8 +45,6 @@ Para trabajar con Docker, Python y Odoo, necesitarás instalar algunas extension
 | **YAML** | Ayuda con la sintaxis del archivo docker-compose.yml |
 | **PostgreSQL** (opcional) | Facilita la conexión y consultas a bases de datos PostgreSQL |
 
-![Extensiones instaladas en VS Code](img.png)
-
 ### 1.3 Verificar Docker
 
 Asegúrate de que Docker Desktop esté ejecutándose. Puedes verificarlo abriendo una terminal en VS Code y ejecutando:
@@ -66,11 +66,11 @@ Este archivo define tres servicios que trabajarán juntos:
 services:
 
   odoo:
-    image: odoo:18 #
+    image: odoo:18
     container_name: odoo
     ports:
-      - "8069:8069" # Usamos el puerto recomendado por Odoo
-    depends_on: # Aseguramos que Odoo se inicie después de la base de datos
+      - "8069:8069" # Puerto para acceder a Odoo
+    depends_on:
       - db
     environment:
       - HOST=db
@@ -80,7 +80,7 @@ services:
       - odoo_data:/var/lib/odoo
 
   db:
-    image: postgres:16 # Usaramos la version 16 de Postgres
+    image: postgres:16
     container_name: odoo_db
     environment:
       - POSTGRES_USER=odoo
@@ -90,217 +90,152 @@ services:
       - db_data:/var/lib/postgresql/data
 
   pgadmin:
-    image: dpage/pgadmin4:latest # Imagen oficial de pgAdmin
+    image: dpage/pgadmin4:latest
     restart: unless-stopped
     depends_on:
-      - db # Aseguramos que pgAdmin se inicie después de la base de datos
+      - db
     environment:
       - PGADMIN_DEFAULT_EMAIL=danifv02@gmail.com
       - PGADMIN_DEFAULT_PASSWORD=Abc123.
     ports:
-      - "8081:80" # Mapeamos el puerto 80 del contenedor al 8081 del host
+      - "8081:80" # Puerto para acceder a PgAdmin
 
 volumes:
-  odoo_data: # Volumen para persistir datos de Odoo
-  db_data: # Volumen para persistir datos de PostgreSQL
+  odoo_data:
+  db_data:
 ```
-
-**Explicación de los servicios:**
-
-- **odoo**: Contenedor con Odoo 18, accesible en `http://localhost:8069`
-- **db**: Base de datos PostgreSQL 16 que utilizará Odoo
-- **pgadmin**: Interfaz web para administrar PostgreSQL, accesible en `http://localhost:8081`
 
 ### 2.2 Levantar los Contenedores
 
-1. Abre una terminal en la carpeta donde guardaste el archivo `docker-compose.yml`
-2. Ejecuta el siguiente comando:
+Ejecuta el siguiente comando en la terminal:
 
 ```bash
 docker-compose up -d
 ```
 
-Este comando descargará las imágenes necesarias y levantará los contenedores en segundo plano.
-
-![Terminal ejecutando docker-compose up](img_1.png)
-
-### 2.3 Verificar que los Contenedores Están Corriendo
-
-Puedes verificar que todos los contenedores estén ejecutándose con:
-
-```bash
-docker ps
-```
-
-O usando la extensión de Docker en VS Code, donde verás los tres contenedores activos.
-
-![Docker Desktop mostrando los contenedores activos](img_2.png)
-
 ---
 
-## Paso 3: Configurar Odoo con Datos de Demostración
+## Paso 3: Configurar PgAdmin
 
-### 3.1 Acceder a Odoo
+### 3.1 Acceder a PgAdmin
 
-1. Abre tu navegador web
-2. Ve a `http://localhost:8069`
-3. Verás la pantalla de configuración inicial de Odoo
-
-![Pantalla inicial de Odoo](img_3.png)
-
-### 3.2 Crear la Base de Datos con Datos de Demostración
-
-Completa el formulario de creación de base de datos:
-
-1. **Master Password**: Deja la contraseña por defecto o crea una nueva (guárdala bien)
-2. **Database Name**: Elige un nombre (ej: `odoo_demo`)
-3. **Email**: Tu email (será el usuario administrador)
-4. **Password**: Contraseña para el usuario administrador
-5. **Phone Number**: Opcional
-6. **Language**: Español / Spanish
-7. **Country**: España (o tu país)
-8. **⚠️ IMPORTANTE**: Marca la casilla **"Load demonstration data"** (Cargar datos de demostración)
-
-![Formulario de creación de base de datos](img_4.png)
-
-Haz clic en "Create Database" y espera a que se complete el proceso (puede tardar unos minutos).
-
-### 3.3 Acceder al Panel de Odoo
-
-Una vez creada la base de datos, serás redirigido al panel principal de Odoo.
-
-![Panel principal de Odoo](img_5.png)
-
-### 3.4 Instalar Módulos Básicos
-
-1. Ve al menú **Aplicaciones** (Apps)
-2. Verás una lista de módulos disponibles
-3. Instala los módulos básicos que necesites, por ejemplo:
-   - **Ventas** (Sales)
-   - **Compras** (Purchase)
-   - **Contactos** (Contacts)
-   - **Inventario** (Inventory)
-   - **Facturación** (Invoicing)
-
-![Menú de aplicaciones en Odoo](img_6.png)
-
-4. Haz clic en "Install" o "Activate" en cada módulo
-5. Espera a que se instalen (puede tardar unos minutos)
-
-![Instalando un módulo](img_7.png)
-
-### 3.5 Explorar los Datos de Demostración
-
-Una vez instalados los módulos, podrás navegar por ellos y ver datos de ejemplo:
-
-- **Contactos**: Clientes y proveedores de ejemplo
-- **Productos**: Catálogo de productos de muestra
-- **Ventas**: Presupuestos y pedidos de venta de ejemplo
-- **Compras**: Órdenes de compra de ejemplo
-
-![Explorando datos de demostración en Odoo](img_8.png)
-
-Estos datos te permitirán familiarizarte con el funcionamiento de Odoo sin tener que crear todo desde cero.
-
-![Vista de módulos con datos de demostración](img_9.png)
-
----
-
-## Paso 4: Explorar la Base de Datos con PgAdmin
-
-### 4.1 Acceder a PgAdmin
-
-1. Abre tu navegador web
-2. Ve a `http://localhost:8081`
-3. Verás la pantalla de inicio de sesión de PgAdmin
-
-![Pantalla de inicio de PgAdmin](img_10.png)
-
-4. Inicia sesión con las credenciales del `docker-compose.yml`:
+1. Abre tu navegador y ve a `http://localhost:8081`
+2. Inicia sesión con:
    - **Email**: `danifv02@gmail.com`
    - **Password**: `Abc123.`
 
-### 4.2 Conectar con el Servidor PostgreSQL
+![Pantalla de login de PgAdmin](img.png)
 
-1. Una vez dentro, haz clic derecho en "Servers" en el panel izquierdo
-2. Selecciona **"Register" > "Server"**
-3. En la pestaña **"General"**:
-   - **Name**: Odoo DB (o el nombre que prefieras)
-4. En la pestaña **"Connection"**:
-   - **Host name/address**: `db` (nombre del servicio en docker-compose)
-   - **Port**: `5432` (puerto por defecto de PostgreSQL)
-   - **Maintenance database**: `postgres`
-   - **Username**: `odoo`
-   - **Password**: `odoo`
-   - Marca "Save password" si quieres
+### 3.2 Registrar el Servidor PostgreSQL
 
-![Configuración de conexión en PgAdmin](img_11.png)
+1. Haz clic derecho en "Servers" → "Register" → "Server"
+2. En la pestaña **General**: Name = `odoo`
+3. En la pestaña **Connection**:
+   - Host: `postgres` (primer intento) o `db` (segundo intento)
+   - Port: `5432`
+   - Maintenance database: `odoo`  
+   - Username: `danifv02`
+   - Password: (tu contraseña)
 
-5. Haz clic en "Save"
+![Primera configuración de conexión](img_1.png)
 
-### 4.3 Inspeccionar la Base de Datos de Odoo
+Si la primera configuración no funciona, usa:
+   - Host: `db`
+   - Username: `odoo`
+   - Password: `odoo`
+   - Maintenance database: `postgres`
 
-1. En el panel izquierdo, expande:
-   - **Servers** > **Odoo DB** > **Databases**
-2. Verás la base de datos que creaste (ej: `odoo_demo`)
-3. Expande la base de datos y luego **Schemas** > **public** > **Tables**
-4. Aquí verás todas las tablas que Odoo ha creado
+![Segunda configuración de conexión](img_2.png)
 
-![Explorando las tablas de Odoo en PgAdmin](img_12.png)
+### 3.3 Verificar Conexión
 
-Algunas tablas importantes:
-- `res_partner`: Contactos (clientes, proveedores)
-- `product_product`: Productos
-- `sale_order`: Órdenes de venta
-- `purchase_order`: Órdenes de compra
-- `account_move`: Asientos contables
+Una vez conectado verás el dashboard de PgAdmin:
 
-Puedes hacer clic derecho en cualquier tabla y seleccionar **"View/Edit Data" > "First 100 Rows"** para ver los datos que Odoo ha almacenado.
+![Dashboard de PgAdmin](img_3.png)
+
+Y podrás explorar las bases de datos:
+
+![Árbol de bases de datos](img_4.png)
+
+---
+
+## Paso 4: Crear Base de Datos en Odoo
+
+### 4.1 Acceder a Odoo
+
+1. Abre tu navegador y ve a `http://localhost:8069`
+2. Completa el formulario de creación de base de datos:
+   - **Database Name**: Elige un nombre (ej: `odoo_demo`)
+   - **Email**: Tu email
+   - **Password**: Tu contraseña
+   - **Language**: Español
+   - **Country**: España (o tu país)
+   - **⚠️ MUY IMPORTANTE**: Marca **"Load demonstration data"**
+
+![Formulario de creación de base de datos](img_5.png)
+
+---
+
+## Paso 5: Instalar Módulos en Odoo
+
+### 5.1 Acceder al Menú de Aplicaciones
+
+Una vez creada la base de datos, accede al menú de **Aplicaciones**:
+
+![Menú de aplicaciones](img_6.png)
+
+### 5.2 Instalar Módulos
+
+Instala los módulos que necesites (Ventas, Compras, Inventario, etc.):
+
+![Instalando módulos](img_7.png)
+
+![Módulo instalado](img_8.png)
+
+![Explorando módulos con datos demo](img_9.png)
+
+---
+
+## Paso 6: Inspeccionar Base de Datos con PgAdmin
+
+### 6.1 Ver la Nueva Base de Datos
+
+Vuelve a PgAdmin y actualiza. Verás tu nueva base de datos de Odoo:
+
+![Base de datos de Odoo en PgAdmin](img_10.png)
+
+### 6.2 Explorar Tablas
+
+Expande: Servers → odoo → Databases → [tu_bd] → Schemas → public → Tables
+
+![Tablas de Odoo](img_11.png)
+
+### 6.3 Ver Datos
+
+Haz clic derecho en una tabla → "View/Edit Data" → "First 100 Rows":
+
+![Visualizando datos de tablas](img_12.png)
 
 ---
 
 ## 🎉 ¡Listo!
 
-Ahora tienes un entorno de desarrollo Odoo 18 completo funcionando con:
-- ✅ Odoo 18 Community en `http://localhost:8069`
-- ✅ PostgreSQL 16 como base de datos
-- ✅ PgAdmin para administrar la base de datos en `http://localhost:8081`
-- ✅ Datos de demostración para explorar y aprender
+Ahora tienes:
+- ✅ Odoo 18 en `http://localhost:8069`
+- ✅ PostgreSQL 16
+- ✅ PgAdmin en `http://localhost:8081`
+- ✅ Datos de demostración
 
 ### Comandos Útiles
 
-Para **detener** los contenedores:
 ```bash
-docker-compose down
+docker-compose down          # Detener
+docker-compose up -d         # Reiniciar
+docker logs odoo -f          # Ver logs
+docker-compose down -v       # Eliminar todo (⚠️ borra datos)
 ```
-
-Para **reiniciar** los contenedores:
-```bash
-docker-compose up -d
-```
-
-Para **ver los logs** de Odoo:
-```bash
-docker logs odoo -f
-```
-
-### Notas Importantes
-
-- Los datos se persisten en volúmenes de Docker, por lo que no perderás tu información al reiniciar los contenedores
-- Si quieres empezar de cero, puedes eliminar los volúmenes con `docker-compose down -v` (⚠️ esto borrará todos los datos)
-- Odoo está programado en Python, por lo que las extensiones de Python en tu IDE te serán muy útiles si quieres desarrollar módulos personalizados
-
----
-
-## 📚 Recursos Adicionales
-
-- [Documentación oficial de Odoo](https://www.odoo.com/documentation/18.0/)
-- [Documentación de Docker](https://docs.docker.com/)
-- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
 
 ---
 
 **Autor**: Daniel Figueroa  
-**Fecha**: 2024  
 **Versión**: Odoo 18 Community
-
