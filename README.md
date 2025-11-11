@@ -1,7 +1,6 @@
-# Instalación de Odoo en DOCKER-COMPOSE
+# Instalación de Odoo con Docker Compose
 
-Esta guia describe los pasos para instalar Odoo utilizando Docker Compose.
-
+Guía rápida para levantar Odoo usando `docker-compose`. Incluye un ejemplo mínimo, pasos para la instalación y cómo acceder a los servicios.
 Archivo docker-compose.yml de ejemplo:
 
 ```yaml
@@ -47,29 +46,50 @@ volumes:
   db_data: # Volumen para persistir datos de PostgreSQL
 ```
 
+
+## Pasos para la instalación
+
+### Entramos en PgAdmin a traves del puerto 8081, con nuestro email y contraseña.
+
 ![img.png](img.png)
 
-![img_1.png](img_1.png)
+### En PgAdmin, añadimos un nuevo servidor para conectarnos a la base de datos de Odoo.
 
 ![img_2.png](img_2.png)
 
+### Bases de datos funcionando: 
+
 ![img_3.png](img_3.png)
 
-![img_4.png](img_4.png)
+### Accedemos a Odoo a traves del puerto 8069, con los datos de administrador.
 
 ![img_5.png](img_5.png)
 
+### Odoo ya está instalado y funcionando correctamente.
+
 ![img_6.png](img_6.png)
+
+### Módulo "Sales" instalado y funcionando:
 
 ![img_7.png](img_7.png)
 
+### Módulo "Contacts" instalado y funcionando:
+
 ![img_8.png](img_8.png)
 
-![img_9.png](img_9.png)
+### Dentro del módulo "Contacts", podemos ver los contactos creados:
 
 ![img_10.png](img_10.png)
 
+### Módulo "Events" instalado y funcionando:
+
+![img_9.png](img_9.png)
+
+### Tablas de la la base de datos de Odoo en PgAdmin funcionando correctamente::
+
 ![img_11.png](img_11.png)
+
+Extensiones usadas en PyCharm:
 
 ![img_12.png](img_12.png)
 
