@@ -1,3 +1,10 @@
+# Instalación de Odoo en DOCKER-COMPOSE
+
+Esta guia describe los pasos para instalar Odoo utilizando Docker Compose.
+
+Archivo docker-compose.yml de ejemplo:
+
+```yaml
 services:
 
   odoo:
@@ -38,3 +45,12 @@ services:
 volumes:
   odoo_data: # Volumen para persistir datos de Odoo
   db_data: # Volumen para persistir datos de PostgreSQL
+```
+
+![img.png](img.png)
+
+![img_1.png](img_1.png)
+
+![img_2.png](img_2.png)
+
+![img_3.png](img_3.png)
